@@ -32,14 +32,17 @@ export class AuthService {
       }
     }
   }
-  // async signup(dto: AuthDto) {
-  //   const hash = await argon.hash(dto.password);
-  //   const user = await this.prisma.user.create({
-  //     data: {
-  //       email: dto.email,
-  //       hash,
-  //     },
-  //   });
-  //   return user;
-  // }
+  async signin(dto: AuthDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+    if (!user) throw new ForbiddenException('Credentials incorrect');
+
+    const passwordMatches = await argon.verify(user.hash, dto.password);
+    if (!passwordMatches) throw new ForbiddenException('Credential incorrect');
+    delete user.hash;
+    return user;
+  }
 }
