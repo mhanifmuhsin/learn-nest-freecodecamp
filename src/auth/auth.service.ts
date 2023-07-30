@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { AuthDto } from './dto';
 import * as argon from 'argon2';
 import { PrismaService } from '../prisma/prisma.service';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { AuthDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +14,13 @@ export class AuthService {
         email: dto.email,
         hash,
       },
+
+      // select: {
+      //   email: true,
+      //   createdAt: true,
+      // },
     });
+    delete user.hash;
     return user;
   }
   // async signup(dto: AuthDto) {
